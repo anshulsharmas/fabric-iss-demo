@@ -1,0 +1,53 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "HTTP": {
+                "inputs": {
+                    "method": "GET",
+                    "uri": "http://api.open-notify.org/astros.json"
+                },
+                "runAfter": {},
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                },
+                "type": "Http"
+            },
+            "Send_event": {
+                "inputs": {
+                    "body": {
+                        "ContentData": "@{base64(body('HTTP'))}"
+                    },
+                    "host": {
+                        "connection": {
+                            "referenceName": "eventhubs-2"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/@{encodeURIComponent('es_bf6d095a-e7cd-4f79-a75b-1cd7dd731b50')}/events"
+                },
+                "runAfter": {
+                    "HTTP": [
+                        "SUCCEEDED"
+                    ]
+                },
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Minute",
+                    "interval": 1,
+                    "timeZone": "Singapore Standard Time"
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "kind": "Stateful"
+}

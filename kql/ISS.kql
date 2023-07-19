@@ -1,0 +1,39 @@
+//***********************************************************************************************************
+//http://open-notify.org/Open-Notify-API/
+//***********************************************************************************************************
+
+ISS_Loc
+| summarize max(Timestamp), min(Timestamp)
+
+
+//total records
+ISS_Loc
+| count 
+
+// ISS latest tragectory
+ISS_Loc
+| top 20 by Timestamp
+| project Longitude, Latitude, Timestamp
+| render scatterchart with ( kind=map )
+
+
+
+// ISS complete orbit
+ISS_Loc
+| where Timestamp > ago(90m)
+| project Longitude, Latitude, Timestamp
+| render scatterchart with ( kind=map )
+
+
+
+// which humans are in space right now?
+Astronauts
+| top 1 by ['x-opt-enqueued-time']
+| mv-expand people
+| project Name= people.name, Craft=people.craft
+
+
+
+
+
+
